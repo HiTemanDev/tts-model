@@ -75,3 +75,8 @@ Sebelum menggunakan model ini, pastikan telah menginstal dependensi berikut:
 5. numpy
 6. scipy
 7. noisereduce
+
+# Referensi
+1. Facebook AI. (2023). Massively Multilingual Speech (MMS). https://huggingface.co/facebook/mms-tts-ind
+2. Kim, J., Kong, J., & Son, J. (2021). Conditional Variational Autoencoder for TTS (VITS). _arXiv preprint arXiv:2106.06103._
+3. Python libraries: ```transformers, torch, noisereduce, librosa, soundfile```
