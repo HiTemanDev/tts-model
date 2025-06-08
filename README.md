@@ -4,79 +4,59 @@ This model created by :
 2. Igga Febrian Virgiani – Universitas Telkom
 
 Notebook :
-https://colab.research.google.com/drive/1kbkHQ1XiY48HJaCALgehikldd-wr1Ljs?usp=sharing
+https://colab.research.google.com/drive/1GSgPRTUTHQswAEDZD9Axwn-5ciykX3Yi?usp=sharing
 
-# Text-to-Speech (TTS) untuk HiTeman Audio Therapy
-Sistem HiTeman Audio Therapy menggunakan pendekatan Text-to-Speech (TTS) berbasis Multilingual MMS TTS (facebook/mms-tts-ind) dari Hugging Face untuk menghasilkan audio terapi dalam bahasa Indonesia yang natural. Sistem ini ditujukan untuk mendukung terapi psikologis berbasis audio yang responsif dan ramah pengguna
+# 🗣️ HiTeman TTS (Text-to-Speech) Model
 
-# Arsitektur Sistem
-HiTeman TTS terdiri dari tiga komponen utama:
+**HiTeman TTS** adalah modul berbasis Python untuk menghasilkan narasi otomatis dan mengonversinya ke audio menggunakan model **Gemini 1.5 Flash** dan **TTS Native Gemini (gemini-2.5-flash-preview-tts)** dari Google.
 
-1. MMSTTSEngine – Mesin TTS berbasis model facebook/mms-tts-ind dengan post-processing lanjutan.
-2. AudioTherapyGenerator – Modul pembangkit terapi berdasarkan skrip dan kondisi emosional pengguna.
-3. HiTemanAudioTherapy – Sistem integratif yang menangani greeting, screening, sesi terapi, dan demo sistem.
+Proyek ini dirancang untuk menghasilkan narasi dari prompt/topik yang diberikan oleh label klasifikasi emosi (lihat [HiTeman Klasifikasi](https://github.com/HiTemanDev/clasification-model)), serta menyintesis suara dari teks tersebut menjadi file audio (MP3).
 
-# Model Yang Digunakan
-1. Model: facebook/mms-tts-ind
-2. Framework: Hugging Face Transformers
-3. Sampling Rate: 16,000 Hz
-4. Arsitektur: VITS (Variational Inference Text-to-Speech)
-5. Bahasa: Bahasa Indonesia
+---
 
-Model ini dilatih untuk menghasilkan suara bahasa Indonesia yang alami dan dipilih karena:
-1. Mendukung inferensi lokal
-2. Open-source dan ringan
+## 🔍 Fitur Utama
 
-# Pipeline Pemrosesan TTS
-## 1. Synthesis dengan MMS TTS
-a. Teks di-tokenisasi menggunakan AutoTokenizer\
-b. Model VitsModel menghasilkan waveform mentah\
-c. Proses dilakukan di CPU atau GPU sesuai ketersediaan perangkat
+- 🎙️ **Text Generation**: Menggunakan Gemini 1.5 Flash untuk menghasilkan narasi dari prompt teks label emosi (lihat [HiTeman Klasifikasi](https://github.com/HiTemanDev/clasification-model)) .
+- 🔊 **Text-to-Speech**: Menggunakan TTS Native Gemini (gemini-2.5-flash-preview-tts) untuk mengonversi narasi menjadi audio.
+- 💾 **Output Otomatis**: Menyimpan hasil narasi dan audio ke Google Drive atau lokal.
+- 🤖 Dapat digunakan secara terintegrasi dalam backend (lihat [HiTeman API](https://github.com/HiTemanDev/backend-api)).
 
-## 2. Post-Processing (v2)
-a. Untuk meningkatkan kejernihan dan kualitas suara, dilakukan beberapa langkah lanjutan.\
-b. Noise Reduction: Menggunakan pustaka noisereduce, menyaring noise latar dengan parameter konservatif.\
-c. High-Pass Filtering: Menghapus frekuensi rendah di bawah 90 Hz yang sering mengganggu kejernihan suara.\
-d. Equalization (Peaking Filter):
-  - Boost di 3000 Hz dengan Q=1.8 dan gain=2.0 dB untuk meningkatkan kejernihan vokal.\
-  - Opsional: tuning frekuensi mid dan low untuk menghindari suara “boxy”.\
+---
 
-## 3. Normalisasi
-Amplitudo suara dinormalisasi agar konsisten di berbagai perangkat.
+## 🧠 Teknologi yang Digunakan
 
-## 4. Fallback TTS (Basic)
-Jika model MMS gagal dimuat (misalnya tidak ada koneksi internet), sistem otomatis menggunakan fallback basic TTS sintetis berbasis waveform sinus, harmonik, dan formant secara heuristik.
+- **Google Gemini 1.5 Flash** — untuk pembuatan konten narasi.
+- **TTS Native Gemini (gemini-2.5-flash-preview-tts)** — untuk sintesis suara (text-to-speech).
+- **Google Colab + Drive** — untuk penyimpanan hasil.
+- **Python** — sebagai bahasa utama implementasi.
 
-# Skrip Terapi dan Output Audio
-Sistem mendukung 3 kondisi emosional utama: sedih, cemas, dan stress. Setiap kondisi memiliki skrip audio terapeutik yang disintesis menjadi .wav file melalui AudioTherapyGenerator. Contoh skrip untuk kondisi cemas:
+---
 
-> "Mari kita praktikkan teknik grounding lima-empat-tiga-dua-satu. Sebutkan dalam hati lima hal yang dapat Anda lihat di sekitar Anda sekarang..."
+## 🧠 Input
+```json
+{
+  "emotion": "stress"
+}
+```
 
-Output file disimpan dalam format .wav seperti therapy_mms_cemas_1.wav, therapy_mms_stress_3.wav, dan seterusnya.
-# Fitur:
-1. Suara yang Natural: Menghasilkan suara yang mirip dengan manusia untuk meningkatkan pengalaman pengguna.
-2. Pengaturan Kecepatan dan Intonasi: Pengguna dapat menyesuaikan kecepatan berbicara dan intonasi suara untuk pengalaman yang lebih personal.
-3. Proses Pasca-Pengolahan: Menerapkan teknik pengurangan noise dan filter suara untuk kejernihan audio yang lebih baik.
-4. Pemrosesan Real-Time: Memberikan hasil suara dalam waktu nyata, cocok untuk aplikasi interaktif seperti chatbot.
+## 🔊 Output
+- File `.wav` berupa audio terapi.
+- Disimpan dengan nama format `hiteman_therapy_audio_native_<timestamp>.wav`.
 
-# Cara Kerja
-Proses secara umum meliputi:
-1. Tokenisasi: Mengonversi teks menjadi format yang dapat dipahami oleh model.
-2. Sintesis Suara: Menggunakan model TTS untuk menghasilkan waveform audio dari input teks.
-3. Pasca-Pengolahan: Menerapkan filter dan teknik pengurangan noise untuk meningkatkan kualitas audio.
+## 📦 Prasyarat
+```bash
+pip install -r requirements.txt
+```
 
-# Persyaratan
-Sebelum menggunakan model ini, pastikan telah menginstal dependensi berikut:
+## 📝 Catatan
+- Pastikan memiliki kredensial Gemini API.
 
-1. torch
-2. transformers
-3. librosa
-4. soundfile
-5. numpy
-6. scipy
-7. noisereduce
+## 🧩 Integrasi
 
-# Referensi
-1. Facebook AI. (2023). Massively Multilingual Speech (MMS). https://huggingface.co/facebook/mms-tts-ind
-2. Kim, J., Kong, J., & Son, J. (2021). Conditional Variational Autoencoder for TTS (VITS). _arXiv preprint arXiv:2106.06103._
-3. Python libraries: ```transformers, torch, noisereduce, librosa, soundfile```
+Modul ini didesain agar dapat digunakan dalam backend lain, seperti FastAPI API (`hitemanAPI`).
+
+---
+
+## 📄 Lisensi
+
+MIT License © HiTeman Dev
